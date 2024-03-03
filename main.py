@@ -2,7 +2,7 @@ from telebot import TeleBot
 import json
 
 env = json.load(open("env.json"))
-app = TeleBot(env["tg-api-key"])
+app = TeleBot(env["secret"]["tg-api-key"])
 
 if __name__ == "__main__":
-    app.send_message(env["tg-channel-id"], "salam")
+    app.send_message(env["secret"]["tg-channel-id"], "salam")
