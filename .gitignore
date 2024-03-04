@@ -161,4 +161,4 @@ cython_debug/
 
 
 # api-keys and stuff
-env.json
+conf.json

@@ -8,5 +8,5 @@ joke_apis = [
 def getJoke() :
     return random.choice(joke_apis)()
 
-def post(bot, env) :
-    bot.send_message(env["secret"]["tg-channel-numeric-id"], "{}\n{}".format(getJoke(), env["secret"]["tg-channel-id"]))
+def post(bot, conf) :
+    bot.send_message(conf["secret"]["tg-channel-numeric-id"], "{}\n{}".format(getJoke(), conf["secret"]["tg-channel-id"]))
