@@ -2,6 +2,8 @@ import requests
 from redvid import Downloader
 from os import path
 
+subreddits = ["discordVideos", "WTF", "videomemes", "UnusualVideos", "shitposting", "HolUp"]
+
 def getMedia(dct) :
     if ("data" in dct and "is_video" in dct["data"] and dct["data"]["is_video"]) :
         return dct["data"]["url"]
@@ -12,10 +14,26 @@ def getName(dct) :
         return dct["data"]["name"]
     return None
 
+def sortedByScore(dct) :
+    return sorted(dct, key=lambda i : i["data"]["calc-score"], reverse=True)
+
+def setScore(dct) :
+    for i in dct :
+        if (not "data" in i) :
+            continue
+        i["data"]["calc-score"] = i["data"]["score"] / i["data"]["subreddit_subscribers"] * 10 +\
+                                    i["data"]["upvote_ratio"] * i["data"]["upvote_ratio"] * 1 +\
+                                    i["data"]["num_comments"] / i["data"]["subreddit_subscribers"] * 3
+
 def post(bot, conf) :
-    opt = requests.get('https://oauth.reddit.com/r/discordVideos/top', headers=conf["reddit-header"], proxies=conf["proxy"]).json()["data"]["children"]
+    opt = []
+    for i in subreddits :
+        opt += requests.get('https://oauth.reddit.com/r/{}/top'.format(i), headers=conf["reddit-header"], proxies=conf["proxy"]).json()["data"]["children"]
+    setScore(opt)
+    opt = sortedByScore(opt)
     dl = Downloader(max_q=True)
     for i in opt :
+        print(i["data"]["calc-score"])
         vidLink = getMedia(i)
         if (vidLink == None) :
             continue
@@ -33,3 +51,5 @@ def post(bot, conf) :
             exit()
         except Exception as ex:
             print("Upload failed(?) : " + str(ex))
+        
+        # break
